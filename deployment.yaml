@@ -15,7 +15,7 @@ spec:
         app: vulnjavaapp
     spec:
       containers:
-      - name: springboot
+      - name: vulnerable-java-app
         image: ghcr.io/datadog/vulnerable-java-application:latest
         ports:
         - containerPort: 8080
