@@ -32,6 +32,11 @@ jobs:
             --name ${{ secrets.EKS_CLUSTER_NAME }} \
             --region ${{ secrets.AWS_REGION }}
 
+      - name: Limpar ambiente anterior
+        run: |
+          kubectl delete deployment vulnjavaapp --ignore-not-found
+          kubectl delete service vulnjavaapp-service --ignore-not-found
+
       - name: Deploy to EKS using public Datadog image
         run: |
           kubectl set image deployment/vulnjavaapp \
