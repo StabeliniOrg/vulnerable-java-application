@@ -1,12 +1,9 @@
-name: Deploy Datadog App to EKS
+name: Deploy vulnerable-java-app to EKS
 
 on:
   push:
     branches:
       - main
-
-permissions:
-  contents: read
 
 env:
   IMAGE_NAME: ghcr.io/datadog/vulnerable-java-application:latest
@@ -16,32 +13,61 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Update kubeconfig
+      - name: Atualizar kubeconfig
         run: |
-          aws eks update-kubeconfig \
-            --name ${{ secrets.EKS_CLUSTER_NAME }} \
-            --region ${{ secrets.AWS_REGION }}
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
 
-      - name: Limpar ambiente anterior
+      - name: Deletar ambiente anterior (opcional)
         run: |
           kubectl delete deployment vulnjavaapp --ignore-not-found
           kubectl delete service vulnjavaapp-service --ignore-not-found
 
-      - name: Deploy to EKS using public Datadog image
+      - name: Criar novo deployment com imagem do Datadog
         run: |
-          kubectl set image deployment/vulnjavaapp \
-            ${{ secrets.CONTAINER_NAME }}=${{ env.IMAGE_NAME }}
+          cat <<EOF | kubectl apply -f -
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: vulnjavaapp
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: vulnjavaapp
+            template:
+              metadata:
+                labels:
+                  app: vulnjavaapp
+              spec:
+                containers:
+                - name: vulnerable-java-app
+                  image: ${IMAGE_NAME}
+                  ports:
+                  - containerPort: 8000
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: vulnjavaapp-service
+          spec:
+            type: LoadBalancer
+            selector:
+              app: vulnjavaapp
+            ports:
+              - protocol: TCP
+                port: 80
+                targetPort: 8000
+          EOF
 
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/vulnjavaapp
+      - name: Aguardar rollout do deployment
+        run: kubectl rollout status deployment/vulnjavaapp
