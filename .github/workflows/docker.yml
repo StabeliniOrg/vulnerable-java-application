@@ -48,6 +48,7 @@ jobs:
               metadata:
                 labels:
                   app: vulnjavaapp
+                  dynatrace.com/inject: "true"
               spec:
                 containers:
                 - name: vulnerable-java-app
