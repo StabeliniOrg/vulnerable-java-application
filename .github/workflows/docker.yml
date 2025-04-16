@@ -29,18 +29,8 @@ jobs:
             echo "Error: EKS_CLUSTER_NAME or AWS_REGION is not set."
             exit 1
           fi
-          if kubectl get deployment vulnjavaapp; then
-            echo "Deleting existing deployment vulnjavaapp"
-            kubectl delete deployment vulnjavaapp
-          else
-            echo "Deployment vulnjavaapp not found"
-          fi
-          if kubectl get service vulnjavaapp-service; then
-            echo "Deleting existing service vulnjavaapp-service"
-            kubectl delete service vulnjavaapp-service
-          else
-            echo "Service vulnjavaapp-service not found"
-          fi
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+
       - name: Deletar ambiente anterior (opcional)
         run: |
           kubectl delete deployment vulnjavaapp --ignore-not-found
@@ -84,6 +74,6 @@ jobs:
           EOF
 
       - name: Aguardar rollout do deployment
-        run: kubectl rollout status deployment/vulnjavaapp --timeout=5m
+        run: kubectl rollout status deployment/vulnjavaapp
 
       #test
