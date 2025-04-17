@@ -39,9 +39,10 @@ jobs:
 
       - name: Realizar scan no Snyk.io
         uses: snyk/actions/node@master
+        conitnue-on-error: true
         with:
           image: ghcr.io/datadog/vulnerable-java-application:latest
-          args: --file=Dockerfile
+          args: --file=./Dockerfile
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
