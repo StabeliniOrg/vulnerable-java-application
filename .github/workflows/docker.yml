@@ -37,15 +37,21 @@ jobs:
           kubectl delete deployment vulnjavaapp --ignore-not-found
           kubectl delete service vulnjavaapp-service --ignore-not-found
 
-      - name: Realizar scan no Snyk.io
-        uses: snyk/actions/node@master
+      - name: Image Scan
+        uses: snyk/actions/docker@master
         continue-on-error: true
         with:
           image: ghcr.io/datadog/vulnerable-java-application:latest
-          args: --file=./Dockerfile
+          args: --file=Dockerfile
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: SCA Scan
+        uses: snyk/actions/gradle@master
+        continue-on-error: true        
+        env:    
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  
       - name: Criar novo deployment com imagem do Datadog
         run: |
           cat <<EOF | kubectl apply -f -
