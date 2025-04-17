@@ -14,6 +14,8 @@ spec:
       labels:
         app: vulnjavaapp
     spec:
+      securityContext:
+        runAsNonRoot: true 
       containers:
         - name: vulnerable-java-app
           image: ghcr.io/datadog/vulnerable-java-application:latest
