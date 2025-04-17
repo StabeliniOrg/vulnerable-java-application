@@ -6,7 +6,6 @@ on:
       - main
   workflow_dispatch:
   
-
 env:
   IMAGE_NAME: ghcr.io/datadog/vulnerable-java-application:latest
 
@@ -39,7 +38,7 @@ jobs:
           kubectl delete service vulnjavaapp-service --ignore-not-found
 
       - name: Realizar scan no Snyk.io
-        uses: snyk/actions/docker@v2
+        uses: snyk/actions/setup@v2
         with:
           image: ghcr.io/datadog/vulnerable-java-application:latest
           args: --file=Dockerfile
