@@ -38,7 +38,7 @@ jobs:
           kubectl delete service vulnjavaapp-service --ignore-not-found
 
       - name: Realizar scan no Snyk.io
-        uses: snyk/actions/setup@v2
+        uses: snyk/actions/node@master
         with:
           image: ghcr.io/datadog/vulnerable-java-application:latest
           args: --file=Dockerfile
