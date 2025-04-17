@@ -16,6 +16,7 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true 
+        allowPrivilegeEscalation: false
       containers:
         - name: vulnerable-java-app
           image: ghcr.io/datadog/vulnerable-java-application:latest

@@ -43,14 +43,20 @@ jobs:
         with:
           image: ghcr.io/datadog/vulnerable-java-application:latest
           args: --file=Dockerfile
+          command: monitor
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          
+      
 
       - name: SCA Scan
         uses: snyk/actions/gradle@master
         continue-on-error: true        
         env:    
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --all-projects
   
       - name: Criar novo deployment com imagem do Datadog
         run: |
