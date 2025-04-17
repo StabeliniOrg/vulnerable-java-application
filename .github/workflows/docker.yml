@@ -47,7 +47,13 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           
-      
+      - name: IaC Scan
+        uses: snyk/actions/iac@master
+        env:    
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --all-projects
 
       - name: SCA Scan
         uses: snyk/actions/gradle@master
